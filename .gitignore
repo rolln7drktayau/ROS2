@@ -1,0 +1,7 @@
+*.log
+*.pyc
+__pycache__/
+.env
+.DS_Store
+.vscode/
+push_to_github.sh
