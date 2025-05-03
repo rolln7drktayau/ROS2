@@ -80,7 +80,7 @@ Chacun des fichiers `.cpp` dans `src/` est un nœud indépendant que vous pouvez
 - **Commande** :
 
   ```bash
-  ros2 run my_package obstacle_avoidance
+  ros2 run my_package obstacle_avoidance -ros-args -p base_speed:=0.2 -p gain:=1.0
   ```
 
 - **Description** : Le robot évite les obstacles détectés avec le laser. Réagit à la proximité d'objets.
@@ -106,7 +106,7 @@ Chacun des fichiers `.cpp` dans `src/` est un nœud indépendant que vous pouvez
 - **Commande** :
 
   ```bash
-  ros2 run my_package wall_follower
+  ros2 run my_package wall_follower -ros-args -p base_speed:=0.2 -p gain:=1.0
   ```
 
 - **Description** : Le robot suit un mur à une distance constante grâce au capteur laser.
@@ -119,7 +119,7 @@ Chacun des fichiers `.cpp` dans `src/` est un nœud indépendant que vous pouvez
 - **Commande** :
 
   ```bash
-  ros2 run my_package wall_follow_equilibrium
+  ros2 run my_package wall_follow_equilibrium -ros-args -p base_speed:=0.2 -p gain:=1.0
   ```
 
 - **Description** : Variante plus fine du wall following, maintenant une position équilibrée entre plusieurs surfaces.
@@ -132,7 +132,7 @@ Chacun des fichiers `.cpp` dans `src/` est un nœud indépendant que vous pouvez
 - **Commande** :
 
   ```bash
-  ros2 run my_package reading_laser
+  ros2 run my_package reading_laser -ros-args -p base_speed:=0.2 -p gain:=1.0
   ```
 
 - **Description** : Affiche les données brutes du capteur laser sur le terminal. Utile pour le debug.
@@ -145,7 +145,7 @@ Chacun des fichiers `.cpp` dans `src/` est un nœud indépendant que vous pouvez
 - **Commande** :
 
   ```bash
-  ros2 run my_package moving_robot
+  ros2 run my_package moving_robot -ros-args -p base_speed:=0.2 -p gain:=1.0
   ```
 
 - **Description** : Envoie des commandes constantes de mouvement au robot. Utilisé pour tester les déplacements simples.
@@ -158,12 +158,54 @@ Chacun des fichiers `.cpp` dans `src/` est un nœud indépendant que vous pouvez
 - **Commande** :
 
   ```bash
-  ros2 run my_package speed_controller
+  ros2 run my_package speed_controller -ros-args -p base_speed:=0.2 -p gain:=1.0
   ```
 
 - **Description** : Contrôle la vitesse du robot selon des règles internes ou des paramètres dynamiques.
 
 ---
+
+Pour répondre à la **question 4** :
+
+---
+
+### ✅ À quelle vitesse le robot doit-il rouler pour éviter correctement les obstacles ?
+
+La vitesse du robot doit être **modérée**, généralement dans une plage de **0.1 à 0.3 m/s**, en fonction de :
+
+- **La densité d’obstacles** dans l’environnement.
+- **La fréquence de mise à jour des capteurs** (par exemple, la fréquence de publication du `laser_scan`).
+- **Le temps de réaction de l’algorithme d’évitement** (traitement + commandes moteur).
+
+Aller trop vite pourrait faire dépasser l’obstacle entre deux cycles de détection, surtout si les obstacles sont proches ou si les scans sont lents.
+
+---
+
+### 🔍 Paramètre "caché" à prendre en compte
+
+Le paramètre souvent négligé mais **crucial** est le **temps de latence global** du système, qui inclut :
+
+- La fréquence de publication des capteurs (par exemple, 10 Hz = un scan toutes les 100 ms).
+- Le délai de traitement dans le nœud de contrôle (algorithme d’évitement).
+- Le temps d’exécution de la commande sur le robot (moteurs, simulateur).
+
+Ce temps détermine combien de **distance** le robot parcourt **avant** de réagir à un obstacle. Il faut s'assurer que :
+
+```bash
+distance_avant_réaction = vitesse × latence_totale
+```
+
+Donc **nettement inférieure** à la distance minimale entre le robot et un obstacle détecté pour laisser le temps à une manœuvre d’évitement.
+
+---
+
+### ⚠️ En résumé
+
+- Démarre à une vitesse de **0.1 m/s**, puis augmente prudemment si les performances le permettent.
+- Tient compte du **temps de réaction complet** pour assurer une marge de sécurité suffisante.
+- Ajuste dynamiquement la vitesse en fonction de la **proximité des obstacles** si possible (stratégie réactive).
+
+Souhaites-tu un petit calcul d’exemple avec des valeurs concrètes ?
 
 ### 8. **Light Follower**
 
@@ -171,7 +213,7 @@ Chacun des fichiers `.cpp` dans `src/` est un nœud indépendant que vous pouvez
 - **Commande** :
 
   ```bash
-  ros2 run my_package light_follower
+  ros2 run my_package light_follower -ros-args -p base_speed:=0.2 -p gain:=1.0
   ```
 
 - **Description** : Le robot suit une source lumineuse simulée. Utilise un topic de lumière simulée (à configurer dans le monde).
@@ -184,7 +226,7 @@ Chacun des fichiers `.cpp` dans `src/` est un nœud indépendant que vous pouvez
 - **Commande** :
 
   ```bash
-  ros2 run my_package swarm_follower
+  ros2 run my_package swarm_follower -ros-args -p base_speed:=0.2 -p gain:=1.0
   ```
 
 - **Description** : Comportement de robot suiveur dans un scénario de robotique en essaim.
@@ -215,9 +257,9 @@ Les fichiers dans le dossier `worlds/` sont des mondes pour simuler le robot ave
 
 ---
 
-## Auteurs
+## License
 
-- Étudiant XYZ – Projet ROS 2
+- Roland Cédric TAYO – Projet ROS 2 - INEM
 - Basé sur les ressources pédagogiques fournies dans `tp_ros_etudiant_v2.pdf`
 
 ---
